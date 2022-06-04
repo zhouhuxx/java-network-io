@@ -74,16 +74,17 @@ public class Server {
     }
 
     public void send(SocketChannel socketChannel, String msg) {
-        for (SelectionKey selectionKey : selector.keys()) {
-            Channel channel = selectionKey.channel();
-            if (channel instanceof SocketChannel && channel != socketChannel) {
-                try {
-                    ByteBuffer byteBuffer = ByteBuffer.wrap((socketChannel.getRemoteAddress() + ": " + msg).getBytes());
+        try {
+            byte[] bytes = (socketChannel.getRemoteAddress() + ": " + msg).getBytes();
+            for (SelectionKey selectionKey : selector.keys()) {
+                Channel channel = selectionKey.channel();
+                if (channel instanceof SocketChannel && channel != socketChannel) {
+                    ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
                     ((SocketChannel) channel).write(byteBuffer);
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
